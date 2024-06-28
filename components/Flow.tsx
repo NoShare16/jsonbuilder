@@ -8,8 +8,10 @@ import "../app/globals.css";
 import useStore from "../zustand/store";
 
 import StandartNode from "../nodeTypes/StandartNode";
+import SubNode from "../nodeTypes/SubNode";
 const nodeTypes = {
   standart: StandartNode,
+  sub: SubNode,
 };
 
 const selector = (state: any) => ({

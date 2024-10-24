@@ -21,7 +21,7 @@ function StandartNode({ id, data }: NodeProps<NodeData>) {
           borderRadius: "50%",
         }}
       />
-      <p className="text-white text-sm font-semibold">Node test{id}</p>
+      <p className="text-white text-sm font-semibold">Node {id}</p>
       <button
         onClick={() => addSubNode(id)}
         className="mt-2 flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 font-medium py-1 px-4 rounded focus:outline-none focus:shadow-outline"

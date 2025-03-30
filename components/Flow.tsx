@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
-import ReactFlow, { Background, Panel } from "reactflow";
+import ReactFlow, { Background, Edge, Panel } from "reactflow";
 
 import "reactflow/dist/style.css";
 import "../app/globals.css";
@@ -38,15 +38,16 @@ function Flow() {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         fitView
+        deleteKeyCode={[]} // <- verhindert Entfernen per Entf/Backspace
       >
-        <Panel position="top-right">
+        {/*<Panel position="top-right">
           <button
             onClick={addStandartNode}
             className="mt-2 flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 font-medium py-1 px-4 rounded focus:outline-none focus:shadow-outline"
           >
             Add Standart Node
           </button>
-        </Panel>
+        </Panel>*/}
         <Background />
       </ReactFlow>
     </>

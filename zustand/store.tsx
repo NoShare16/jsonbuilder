@@ -79,51 +79,54 @@ const useStore = create<RFState>((set, get) => ({
   },
   addSubNode: (upperId) => {
     console.log("Adding sub-node to:", upperId);
-    const nodes = get().nodes;
+    const { nodes, edges } = get();
     const parent = nodes.find((node) => node.id === upperId);
 
     if (!parent) {
       console.error("Parent node not found");
-      return; // Exit if no parent found
+      return;
     }
 
     if (!Array.isArray(parent.ancestors)) {
       console.warn("Parent node has no valid ancestors array, initializing...");
-      parent.ancestors = []; // Initialize to empty if undefined or invalid
+      parent.ancestors = [];
     }
 
-    console.log("before nodes:", nodes);
     const newId = `sub-${+new Date()}`;
     const level = parent.ancestors.length + 1;
-    console.log("Level:", level);
+
     const getColorForLevel = (level: any) => {
-      const hue = level * 137; // 137 is the golden angle approximation
+      const hue = level * 137;
       return `hsl(${hue % 360}, 70%, 50%)`;
     };
 
     const color = getColorForLevel(level);
+
+    const newPosition = {
+      x: parent.position.x,
+      y: parent.position.y + 150,
+    };
+
     const newNode = {
       id: newId,
       type: "sub",
-      //parentId: upperId,
-      ancestors: parent ? [...parent.ancestors, upperId] : [upperId],
-      //extent: "parent" as "parent",
+      ancestors: [...parent.ancestors, upperId],
       draggable: true,
       style: { width: 200 },
-      position: { x: 0, y: 100 },
+      position: newPosition,
       data: {
         extendId: upperId,
-        allIds: parent
-          ? [...parent.ancestors, upperId, newId].join(",")
-          : `${upperId},${newId}`,
+        allIds: [...parent.ancestors, upperId, newId].join(","),
         level: level,
         color: color,
       },
     };
 
-    console.log("New node:", newNode);
-    set({ nodes: [...nodes, newNode] });
-    console.log("all nodes now:", get().nodes);
+    // Node hinzufügen und gleichzeitig eine Edge erstellen
+    set({
+      nodes: [...nodes, newNode],
+      edges: addEdge({ source: upperId, target: newId }, edges),
+    });
   },
 }));
 

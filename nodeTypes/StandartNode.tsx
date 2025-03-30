@@ -5,7 +5,7 @@ import "../app/globals.css";
 import useStore, { NodeData } from "../zustand/store";
 
 function StandartNode({ id, data }: NodeProps<NodeData>) {
-  console.log("StandartNode", id, data);
+  console.log("StandarNode", id, data);
   const addStandartNode = useStore((state) => state.addStandartNode);
   const addSubNode = useStore((state) => state.addSubNode);
 

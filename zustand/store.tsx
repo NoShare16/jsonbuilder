@@ -28,6 +28,13 @@ export type RFState = {
   setEdges: (edges: Edge[]) => void;
   addStandartNode: () => void;
   addSubNode: (standartId: string) => void;
+  updateNodeData: (nodeId: string, newData: Partial<NodeData>) => void;
+  exportAsNestedJson: () => string;
+  buildNestedJson: (
+    node: Node<NodeData>,
+    allNodes: Node<NodeData>[],
+    allEdges: Edge[]
+  ) => any;
 };
 
 const useStore = create<RFState>((set, get) => ({
@@ -127,6 +134,67 @@ const useStore = create<RFState>((set, get) => ({
       nodes: [...nodes, newNode],
       edges: addEdge({ source: upperId, target: newId }, edges),
     });
+  },
+  updateNodeData: (nodeId, newData) => {
+    set((state) => {
+      const updatedNodes = state.nodes.map((node) => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              // bisherige Data
+              ...node.data,
+              // neue/überschreibende Felder
+              ...newData,
+            },
+          };
+        }
+        return node;
+      });
+
+      return { nodes: updatedNodes };
+    });
+  },
+  buildNestedJson(node, allNodes, allEdges) {
+    // Alle Kanten, deren source === node.id -> Kinder
+    const childrenEdges = allEdges.filter((edge) => edge.source === node.id);
+
+    // Keine Kinder => gebe node.data.value aus, fallback: node.data.key oder ""
+    if (childrenEdges.length === 0) {
+      return node.data.value || "";
+    }
+
+    // Hat Kinder => Objekt aufbauen
+    const result: Record<string, any> = {};
+    childrenEdges.forEach((edge) => {
+      const childNode = allNodes.find((n) => n.id === edge.target);
+      if (!childNode) return;
+
+      // childKey = childNode.data.key
+      const childKey = childNode.data.key || "";
+      const childValue = this.buildNestedJson(childNode, allNodes, allEdges);
+
+      result[childKey] = childValue;
+    });
+    return result;
+  },
+  exportAsNestedJson: () => {
+    const { nodes, edges } = get();
+
+    // Root ist dein "standart"-Node
+    const rootNode = nodes.find((n) => n.type === "standart");
+    if (!rootNode) {
+      // Falls keiner vorhanden => Leer
+      return "{}";
+    }
+
+    // rootKey wird der data.key des Root
+    const rootKey = rootNode.data.key || "root";
+    const nested = get().buildNestedJson(rootNode, nodes, edges);
+
+    // Gesamtobjekt => { [rootKey]: nested }
+    const finalObj = { [rootKey]: nested };
+    return JSON.stringify(finalObj, null, 2);
   },
 }));
 

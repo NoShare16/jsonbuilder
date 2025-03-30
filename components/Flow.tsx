@@ -20,13 +20,24 @@ const selector = (state: any) => ({
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   onConnect: state.onConnect,
+  exportAsNestedJson: state.exportAsNestedJson,
 });
 
 function Flow() {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useStore(
-    useShallow(selector)
-  );
+  const {
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    exportAsNestedJson,
+  } = useStore(useShallow(selector));
   const addStandartNode = useStore((state) => state.addStandartNode);
+  const handleExport = () => {
+    const nestedJson = exportAsNestedJson();
+    console.log("Nested JSON:", nestedJson);
+    // Optional: in ein Textfeld schreiben oder zum Download anbieten
+  };
 
   return (
     <>
@@ -38,7 +49,6 @@ function Flow() {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         fitView
-        deleteKeyCode={[]} // <- verhindert Entfernen per Entf/Backspace
       >
         {/*<Panel position="top-right">
           <button
@@ -48,6 +58,14 @@ function Flow() {
             Add Standart Node
           </button>
         </Panel>*/}
+        <Panel position="top-right">
+          <button
+            onClick={handleExport}
+            className="mt-2 flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 font-medium py-1 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Export Json
+          </button>
+        </Panel>
         <Background />
       </ReactFlow>
     </>

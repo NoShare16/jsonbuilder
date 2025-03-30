@@ -16,7 +16,11 @@ import {
 import initialNodes from "../components/nodes";
 import initialEdges from "../components/edges";
 
-export type NodeData = {};
+export type NodeData = {
+  key?: string;
+  value?: string;
+  emptyValueType?: "string" | "null" | "object" | "array";
+};
 
 export type RFState = {
   nodes: Node<NodeData>[];
@@ -156,26 +160,39 @@ const useStore = create<RFState>((set, get) => ({
     });
   },
   buildNestedJson(node, allNodes, allEdges) {
-    // Alle Kanten, deren source === node.id -> Kinder
     const childrenEdges = allEdges.filter((edge) => edge.source === node.id);
 
-    // Keine Kinder => gebe node.data.value aus, fallback: node.data.key oder ""
+    // Endknoten (keine Kinder)
     if (childrenEdges.length === 0) {
-      return node.data.value || "";
+      // Hat er einen value-Eintrag, der nicht leer ist?
+      if (node.data.value && node.data.value.trim() !== "") {
+        return node.data.value;
+      }
+
+      // Ansonsten: Was tun bei leerem Value?
+      switch (node.data.emptyValueType) {
+        case "null":
+          return null;
+        case "object":
+          return {};
+        case "array":
+          return [];
+        // Default und "string" => ""
+        default:
+          return "";
+      }
     }
 
-    // Hat Kinder => Objekt aufbauen
+    // Hat Kinder => wir bauen ein Objekt, Key => rekursiver Wert
     const result: Record<string, any> = {};
-    childrenEdges.forEach((edge) => {
+    for (const edge of childrenEdges) {
       const childNode = allNodes.find((n) => n.id === edge.target);
-      if (!childNode) return;
+      if (!childNode) continue;
 
-      // childKey = childNode.data.key
       const childKey = childNode.data.key || "";
       const childValue = this.buildNestedJson(childNode, allNodes, allEdges);
-
       result[childKey] = childValue;
-    });
+    }
     return result;
   },
   exportAsNestedJson: () => {

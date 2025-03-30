@@ -35,7 +35,7 @@ function Flow() {
   const addStandartNode = useStore((state) => state.addStandartNode);
   const handleExport = () => {
     const nestedJson = exportAsNestedJson();
-    console.log("Nested JSON:", nestedJson);
+    console.log(nestedJson);
     // Optional: in ein Textfeld schreiben oder zum Download anbieten
   };
 

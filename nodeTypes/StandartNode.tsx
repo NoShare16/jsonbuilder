@@ -16,7 +16,14 @@ function StandartNode({ id, data }: NodeProps<NodeData>) {
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     updateNodeData(id, { value: e.target.value });
   };
+  const handleEmptyValueTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    updateNodeData(id, {
+      emptyValueType: e.target.value as NodeData["emptyValueType"],
+    });
+  };
   const hasChildren = edges.some((edge) => edge.source === id);
+  console.log("Edges:", edges);
+  console.log("hasChildren:", hasChildren);
 
   return (
     <div className="bg-blue-500 border-2 border-blue-800 rounded-lg shadow-lg p-4 flex flex-col items-center transition duration-150 ease-in-out hover:shadow-xl">
@@ -30,7 +37,7 @@ function StandartNode({ id, data }: NodeProps<NodeData>) {
           borderRadius: "50%",
         }}
       />
-      <p className="text-white text-sm font-semibold">Node {id}</p>
+      <p className="text-white text-sm font-semibold"> Root Node</p>
 
       <div className="flex flex-col mt-2 text-white w-full">
         <label className="mb-1">Key</label>
@@ -43,15 +50,31 @@ function StandartNode({ id, data }: NodeProps<NodeData>) {
       </div>
 
       {!hasChildren && (
-        <div className="flex flex-col w-full mb-2">
-          <label className="text-white text-xs mb-1">Value</label>
-          <input
-            className="px-1 py-0.5"
-            type="text"
-            value={data.value || ""}
-            onChange={handleValueChange}
-          />
-        </div>
+        <>
+          <div className="flex flex-col w-full mb-2">
+            <label className="text-white text-xs mb-1">Value</label>
+            <input
+              className="px-1 py-0.5"
+              type="text"
+              value={data.value || ""}
+              onChange={handleValueChange}
+            />
+          </div>
+
+          <div className="flex flex-col w-full">
+            <label className="text-white text-xs mb-1">Empty Value Type</label>
+            <select
+              className="px-1 py-0.5 text-black"
+              value={data.emptyValueType || "string"}
+              onChange={handleEmptyValueTypeChange}
+            >
+              <option value="string">String </option>
+              <option value="null">null</option>
+              <option value="object">empty object </option>
+              <option value="array">empty array </option>
+            </select>
+          </div>
+        </>
       )}
 
       <button
